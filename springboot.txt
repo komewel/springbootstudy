@@ -36,14 +36,12 @@ packaging : war
 java : 11
 오른쪽 add defendencies : 라이브러리 추가를 알아서 해주는 
 				<developer tools> 
-				spring boot dev tools : 코드를 고치면 서버 리로딩을 빠르게 해줌
+				spring boot dev tools : 코드를 고치면 서버 리로딩을 빠							르게 해줌
 				lombok
 				<web>
-				spring web : 아파치 톰캣을 기본제공한다(boot프로젝트에서는 톰캣을
-						라이브러리(내장톰캣) 처럼 쓸수 있다.)
+				spring web : 아파치 톰캣을 기본제공한다(boot프로젝트에				      서는 톰캣을 라이브러리(내장톰캣) 처럼 쓸수 있다.)
 				<template engines>
-				thymeleaf : html의 자바코드를 삽입할수 있게 해준다.(=jstl이 
-						하던 역할)
+				thymeleaf : html의 자바코드를 삽입할수 있게 해준					다.(=jstl이 하던 역할)
 				<sql>
 				mybatis framework
 				mysql driver
@@ -54,3 +52,5 @@ java : 11
 				quartz scheduler :  스케쥴러 기능
 ---> generate 버튼 누르고 
 장점 : 메이븐을 안쓰고 여기서 추가하면 그동안 우리가 쓰던 관련된 디펜던시가 한번에 들어간다
+-----------------------------------------------------------------------------------
+run/debug -> console -> limit console output 체크 해제
