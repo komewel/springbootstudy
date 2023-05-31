@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"> <!-- 나는 타임리프를 써요, 앞으로 항상 들어가야할 속성이다 -->
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script th:src="@{/js/lib/jquery-3.6.4.min.js}"></script>
+<link rel="stylesheet" th:href="@{/css/style.css?ver=1.0}"> <!-- css/style.scc?ver=1.0 이와 같이 타임리프식 파라미터 보내기 -->
+</head>
+<body>
+<ul>
+	 <li><a th:href="@{/bbs/list.do}">BBS</a></li> <!-- contextPath를 앞으로는 작성 안해도 된다. 그 밑 경로만 적으면 된다. -->
+</ul>
+
+  <img th:src="@{/images/animal1.jpg}" width="100px;">
+  <div id="picture"></div>
+</body>
+</html>

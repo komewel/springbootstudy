@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.gdu.home.mapper.BbsMapper">
+
+	<select id="getBbsCount" resultType="int">
+		SELECT COUNT(*)
+		  FROM BBS
+	</select>
+
+	<select id="getBbsList" parameterType="Map" resultType="BbsDTO">
+		SELECT A.BBS_NO, A.WRITER, A.TITLE, A.IP, A.CREATED_AT, A.STATE, A.DEPTH, A.GROUP_NO, A.GROUP_ORDER
+		  FROM (SELECT BBS_NO, WRITER, TITLE, IP, CREATED_AT, STATE, DEPTH, GROUP_NO, GROUP_ORDER
+		  		  FROM BBS) A
+		 ORDER BY GROUP_NO DESC, GROUP_ORDER ASC 		  
+		 LIMIT #{begin}, #{recordPerPage}		
+	</select>
+	
+	<!-- 원글 달기 1 -->
+	<!-- 
+		<insert id="addBbs" useGeneratedKeys="true" keyProperty="bbsNo" parameterType="BbsDTO"
+		자동 증가(AUTO_INCREMENT)한 BBS_NO값(groupNo값)을 파라미터로 전달한 BbsDTO 객체의 bbsNo 필드에 저장한다.
+	 -->
+	<insert id="addBbs" useGeneratedKeys="true" keyProperty="bbsNo" parameterType="BbsDTO"> <!-- bbsNo 값이 저장된다 groupNo의 값을 기억시켜서 넣어주려고 -->
+		INSERT INTO BBS
+			(WRITER, TITLE, IP, CREATED_AT, STATE, DEPTH, GROUP_ORDER)
+		VALUES
+			(#{writer}, #{title}, #{ip}, NOW(), 1, 0, 0) <!-- BBS_SEQ.CURRVAL, 새번호 표를 뽑는게 아니라 단순 조회용 -->
+	</insert>
+	<!-- 원글 달기 2, groupNo에다가 값을 넣어주기 위해 mysql에서는 이런 방법을 쓴다. -->
+	<update id="addBbsGroupNo" parameterType="BbsDTO">
+		UPDATE BBS
+		   SET GROUP_NO = #{bbsNo}
+		 WHERE BBS_NO = #{bbsNo}
+	</update>
+	
+	<!-- 삭제 -->
+	<update id="removeBbs" parameterType="int">
+		UPDATE BBS
+		   SET STATE = 0
+		 WHERE BBS_NO = #{bbsNo} 
+	</update>
+	
+	<!-- 기존 답글에 선행 작업(같은 GROUP_NO를 가진 게시글 중 원글의 GROUP_ORDER 보다 큰 GROUP_ORDER 를 가진 게시글의 GROUP_ORDER를 1씩 증가한다. -->
+	<update id="increaseGroupOrder" parameterType="BbsDTO"> <!-- parameterType="BbsDTO"는 원글을 의미한다. -->
+		UPDATE BBS
+		   SET GROUP_ORDER = GROUP_ORDER + 1
+		 WHERE GROUP_NO = #{groupNo} 		<!-- #{groupNo}는 원글의 groupNo를 의미한다. -->
+		   AND GROUP_ORDER > #{groupOrder}  <!-- #{groupOrder}는 원글의 groupOrder를 의미한다. --> 	
+	</update>
+	
+	<!-- 답글달기 -->
+	<insert id="addReply" useGeneratedKeys="true" keyProperty="bbsNo" parameterType="BbsDTO">  <!-- parameterType="BbsDTO"는 답글을 의미한다. -->
+		INSERT INTO BBS
+			(WRITER, TITLE, IP, CREATED_AT, STATE, DEPTH, GROUP_NO, GROUP_ORDER)
+		VALUES
+			(#{writer}, #{title}, #{ip}, NOW(), 1, #{depth}, #{groupNo}, #{groupOrder})
+	</insert>
+	
+	<!-- 기존 답글에 추가 작업 -->
+	
+</mapper>

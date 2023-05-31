@@ -54,3 +54,24 @@ java : 11
 장점 : 메이븐을 안쓰고 여기서 추가하면 그동안 우리가 쓰던 관련된 디펜던시가 한번에 들어간다
 -----------------------------------------------------------------------------------
 run/debug -> console -> limit console output 체크 해제
+home.zip 파일 압축해제 한 다음 로컬 레파지토리에 옮기면된다 
+
+.gitignore 만들고 application.properties 추가하고 깃 추가 
+
+src -> main -> webapp 에는 아무것도 없다 jsp를 안쓰므로 
+
+bootproject에서는 전에있던 파일을 application.yaml이 일부 가져간다.
+
+boot에는 서버폴더가 따로 있지 않기 때문에 application 파일에서 작업한다.
+	server:   (yaml 버전)      server.port=    (properties버전)
+	  port: 
+
+기존 webcomponent(resources파일)는 static에 저장된다
+
+templates 폴더에는 타임리프관련되어있다.
+
+viewresolver가 없으므로 controller에서 return값에 jsp가 아닌 타임리프가 html로 연결해준다.
+
+실행은 boot Dashboard탭에서 하단 파일 우클릭 start를 눌러주면 옆에 아이콘이 위쪽방향 화살표로 바뀌면 정상 실행된것이다.
+
+whitelabel error page는 문법오류

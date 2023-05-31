@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<!--/* layout/header.html의 headFrag조각으로 head 태그를 바꾼다. */-->
+
+<head th:replace="~{/layout/header::head('BBS목록')}"> <!--/* 일부분만 조각 내서 쓸수있다 */--></head>
+
+<!--/* 자바스크립트 내부에서 Variable Expression은 [[${}]]로 나타낸다. */-->
+<script th:inline="javascript">
+	
+	$(function(){
+		
+		// 원글 달기 결과 메시지
+		let addResult = /*[[${addResult}]]*/ null;
+			
+		if(addResult !== null){  // [[${addResult}]], 값이 전달되지 않으면 null로 주어지는데 이것을 방지할 필요가 있다, addResult가 전달되지 않는 경우 null을 사용한다, 그동안은 빈문자열로 했었다.
+			if(addResult === 2) {  // insert와 update 둘다 성공하는 조건이므로 1이 아니라 2이다.
+				alert('원글이 달렸습니다.');
+			} else {
+				alert('원글 달기가 실패했습니다.');
+			}
+		}
+		
+		// 답글 달기 결과 메시지
+		let addReplyResult = /*[[${removeResult}]]*/ null; // addReplyResult가 전달되지 않는 경우 null을 사용한다.
+		if(addReplyResult !== null){
+			if(addReplyResult === 1) {
+				alert('답글이 달렸습니다.');
+			} else {
+				alert('답글 달기가 실패했습니다.');
+			}
+		}
+		
+		// 게시글 삭제 결과 메시지
+		let removeResult = /*[[${removeResult}]]*/ null; // removeResult가 전달되지 않는 경우 null을 사용한다.
+		if(removeResult !== null){
+			if(removeResult === 1) {
+				alert('게시글이 삭제되었습니다.');
+			} else {
+				alert('게시글 삭제가 실패했습니다.');
+			}
+		}
+		
+		// 삭제 버튼 이벤트
+		$('.frm_remove').on('submit', function(event){ 
+			if(confirm('BBS를 삭제할까요?') == false){
+				event.preventDefault();
+				return;
+			}
+		})
+	
+		// 답글 작성 화면 표시/숨기기
+		$('.btn_reply').on('click', function(){
+			// 작성화면
+			let write = $(this).closest('.list').next();  // write는 jQuery객체이다. (jQuery wrapper가 필요 없다.)
+			// 작성화면이 blind를 가지고 있다 = 다른 작성화면이 열려 있다
+			if(write.hasClass('blind')){
+				
+				$('.write').addClass('blind');  // 모든 작성화면을 닫고
+				write.removeClass('blind');     // 현재 작성화면만 열자
+			// 작성화면이 blind를 가지고 있지 않다 = 현재 작성화면이 열려 있다
+			} else {
+				write.addClass('blind');        // 현재 작성화면을 닫자
+			}
+			
+		})
+	})
+	
+
+</script>
+<style>
+	.blind {
+		display: none;
+	}
+</style>
+<body>
+
+	<!--/* Variable Expression : ${} (값을 나타낼 때 사용) */-->
+
+	<!--/* layout/header.html의 gnbFrag조각으로 div 태그를 바꾼다. */-->
+	<div th:replace="~{/layout/header::gnbFrag}"></div>
+	
+	<h1>BBS 목록 보기</h1>
+
+		<div>
+		<a th:href="@{/bbs/write.html}">BBS작성하러가기</a>
+	</div>
+	
+	<hr>
+	
+	<div>
+		<!--/* 
+		th:text="단순텍스트"
+		th:utext="HTML텍스트(태그가 포함된 텍스트)"
+		 */-->
+	
+		<div th:utext="${pagination}"></div>  <!-- 가져오는 값이 html태그기능이 포함되어있기 때문에 utext이다 -->
+		<table border="1">
+			<thead>
+				<tr>
+					<td>순번</td>
+					<td>작성자</td>
+					<td>제목</td>
+					<td>IP</td>
+					<td>작성일자</td>
+					<td></td>
+				</tr>
+			</thead>
+			<tbody>
+				<th:block th:each="bbs,vs:${bbsList}"> <!-- <c:forEach items="${bbsList}" var="bbs" varStatus="vs">와 같은 기능을 한다. -->
+					<th:block th:if="${bbs.state == 1}">
+						<!-- 게시글 내용 -->
+						<tr class="list">
+							<td th:text="${beginNo - vs.index}"></td> <!-- <td>${beginNo - vs.index}</td> -->
+							<td th:text="${bbs.writer}"></td> <!-- <td>${bbs.writer}</td> -->
+							<td>
+								<!-- DEPTH에 의한 들여쓰기 ex, 1이면 1번 들여쓰기 2이면 2번 들여쓰기--> <!-- n:${#numbers.sequence(1,2,1)} 1부터 2까지 1씩 증가시켜서 n으로 넣어 보내주겠다. -->
+								<th:block th:each="n:${#numbers.sequence(1,bbs.depth,1)}" th:utext="|&nbsp;&nbsp;&nbsp;|"></th:block> <!-- <c:forEach begin="1" end="${bbs.depth}" step="1">&nbsp;&nbsp;&nbsp;</c:forEach>와 같은 기능을 한다. -->
+								<!-- 답글은 [Re] 표시하기 -->																<!-- |&nbsp;&nbsp;&nbsp;| = &nbsp; + &nbsp; + &nbsp; , 이렇게 알아서 연결을 해준다. , bbs.depth는 $로 이미 씌워져 있으므로 또 할 필요가 없다 -->
+								<th:block th:if="${bbs.depth > 0}" th:text="[Re]"></th:block>
+								<!-- 제목 -->
+								<span th:text="${bbs.title}"></span>
+								<!-- 답글작성하기 버튼 -->
+								<input type="button" value="답글" class="btn_reply">
+							</td>
+							<td th:text="${bbs.ip}"></td>
+							<td th:text="${#dates.format(bbs.createdAt, 'yyyy/MM/dd HH:.mm')}"></td>
+							<td>
+								<!-- 작성자만 삭제 가능 -->
+								<th:block th:if="${session.loginId == bbs.writer}"> <!-- 타임리프에서는 sessionScope가 아닌 session이라고 해도 된다. -->
+								<form class="frm_remove" method="post" th:action="${/bbs/remove.do">
+									<input type="hidden" name="bbsNo" th:value="${bbs.bbsNo}">
+									<button>삭제</button>
+								</form>
+								</th:block>
+							</td>
+						</tr>
+						<!-- 답글 작성 화면 -->
+						<tr class="write blind"> <!-- 클래스 2개 주는법 -->
+							<td colspan="6">
+								<form method="post" th:action="@{/bbs/reply/add.do}">
+									<div>
+										<label for="writer">작성자</label>
+										<input id="writer" name="writer" required="required">
+									</div>
+									<div>
+										<label for="title">제목</label>
+										<input id="title" name="title" required="required">
+									</div>
+									<div>
+										<button>답글달기</button>
+										<!-- 원글의 depth, groupNo, groupOrder를 함께 보낸다. -->
+										<input type="hidden" name="depth" th:value="${bbs.depth}">
+										<input type="hidden" name="groupNo" th:value="${bbs.groupNo}">
+										<input type="hidden" name="groupOrder" th:value="${bbs.groupOrder}">
+									</div>
+								</form>
+							</td>
+						</tr>
+					</th:block>
+					<th:block th:if="${bbs.state == 0}"> <!-- <c:if test="${bbs.state == 0}"> 와 동일한 기능을 한다.-->
+						<tr>
+							<td th:text="${beginNo - vs.index}"></td>
+							<td colspan="5">삭제된 게시글입니다.</td>
+						</tr>
+					</th:block>
+				</th:block>
+			</tbody>
+		</table>
+	</div>
+
+</body>
+</html>

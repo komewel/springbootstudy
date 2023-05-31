@@ -1,0 +1,10 @@
+@charset "UTF-8";
+
+#picture {
+ 	width: 192px;  /* 이미지를 넣어주려면 박스 사이즈를 정해줘야 거기 들어간다. */
+	height: 128px;
+	background-image: url('/images/animal1.jpg'); /* 정적자원 경로에서는 static을 적을 필요가없다 */
+  	background-size: 192px 128px;
+ 	background-repeat: no-repeat;
+}
+
